@@ -190,3 +190,17 @@
 .hero-subtitle {
   font-size: 1.3rem;
 }
+
+
+.zoom-in-bg {
+  animation: zoomInEffect 8s ease-in-out forwards;
+}
+
+@keyframes zoomInEffect {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.15);
+  }
+}

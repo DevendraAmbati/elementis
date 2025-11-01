@@ -106,11 +106,14 @@ const HeroSection = () => {
   return (
     <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
       {/* 🔹 Background Slice Flip Animation (Horizontal Slices) */}
-      <div className={`hero-slices-horizontal ${flip ? "flip-active" : ""}`}>
+      <div
+        className={`hero-slices-horizontal zoom-in-bg ${flip ? "flip-active" : ""}`}
+        key={currentImage}
+      >
         {Array.from({ length: 30 }).map((_, i) => (
           <div
             key={i}
-            className="hero-slice-horizontal"
+            className="hero-slice-horizontal "
             style={{
               backgroundImage: `url(${currentSlide.image})`,
               backgroundPosition: `center ${(i / 30) * 100}%`,
