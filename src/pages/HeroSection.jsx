@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "../App.css";
 import Navbar from "./Navbar";
 
@@ -31,11 +31,12 @@ const HeroSection = () => {
   const [progress, setProgress] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(true);
+  const canScroll = useRef(true); // 🟢 control one-time scroll
 
   // Mouse visibility handler (desktop only)
   useEffect(() => {
     const handleMouseMove = (e) => {
-      if (window.innerWidth < 768) return; // disable for mobile
+      if (window.innerWidth < 768) return;
       const { clientX: x, clientY: y } = e;
       setMousePosition({ x, y });
       const windowHeight = window.innerHeight;
@@ -71,17 +72,40 @@ const HeroSection = () => {
     return () => clearInterval(interval);
   }, [currentImage, slides.length]);
 
+  // 🖱 Scroll (only one slide per scroll event)
+  useEffect(() => {
+    const handleScroll = (e) => {
+      if (!canScroll.current) return; // ignore if cooldown active
+      canScroll.current = false; // disable new scrolls
+
+      if (e.deltaY > 0) {
+        // Scroll down → next slide
+        setCurrentImage((prev) => (prev + 1) % slides.length);
+      } else if (e.deltaY < 0) {
+        // Scroll up → previous slide
+        setCurrentImage((prev) => (prev - 1 + slides.length) % slides.length);
+      }
+
+      // Enable scroll again after 1.2s
+      setTimeout(() => {
+        canScroll.current = true;
+      }, 1200);
+    };
+
+    window.addEventListener("wheel", handleScroll, { passive: true });
+    return () => window.removeEventListener("wheel", handleScroll);
+  }, [slides.length]);
+
   const currentSlide = slides[currentImage];
 
   return (
     <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
-{/* Background Image Transition */}
+      {/* Background Image Transition */}
       <div
         key={currentImage}
         className="absolute inset-0 bg-cover bg-center transition-all duration-[2000ms] ease-in-out animate-zoomIn"
         style={{ backgroundImage: `url(${currentSlide.image})` }}
       ></div>
-
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50 z-10"></div>
@@ -89,7 +113,7 @@ const HeroSection = () => {
       {/* Navbar */}
       <Navbar />
 
-      {/* Floating Explore Button (Desktop only) */}
+      {/* Floating Explore Button */}
       {visible && (
         <div
           className="hidden md:block absolute z-30 pointer-events-none transition-transform duration-100 ease-out"
@@ -127,12 +151,9 @@ const HeroSection = () => {
               {currentSlide.title} | {currentSlide.subtitle}
             </span>
             <span className="text-white/70">
-             <span className="animate-fadeUpSmooth"
-              key={`${currentImage}-bottom`}
-              style={{ animationDelay: "0.4s" }}
-            > {currentImage + 1 < 10
+              {currentImage + 1 < 10
                 ? `0${currentImage + 1}`
-                : currentImage + 1}{" "} </span>
+                : currentImage + 1}{" "}
               — {slides.length < 10 ? `0${slides.length}` : slides.length}
             </span>
           </div>
