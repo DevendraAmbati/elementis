@@ -29,11 +29,12 @@ const HeroSection = () => {
 
   const [currentImage, setCurrentImage] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [flip, setFlip] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(true);
-  const canScroll = useRef(true); // 🟢 control one-time scroll
+  const canScroll = useRef(true);
 
-  // Mouse visibility handler (desktop only)
+  // Mouse visibility handler
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (window.innerWidth < 768) return;
@@ -72,21 +73,18 @@ const HeroSection = () => {
     return () => clearInterval(interval);
   }, [currentImage, slides.length]);
 
-  // 🖱 Scroll (only one slide per scroll event)
+  // Scroll navigation
   useEffect(() => {
     const handleScroll = (e) => {
-      if (!canScroll.current) return; // ignore if cooldown active
-      canScroll.current = false; // disable new scrolls
+      if (!canScroll.current) return;
+      canScroll.current = false;
 
       if (e.deltaY > 0) {
-        // Scroll down → next slide
         setCurrentImage((prev) => (prev + 1) % slides.length);
       } else if (e.deltaY < 0) {
-        // Scroll up → previous slide
         setCurrentImage((prev) => (prev - 1 + slides.length) % slides.length);
       }
 
-      // Enable scroll again after 1.2s
       setTimeout(() => {
         canScroll.current = true;
       }, 1200);
@@ -96,16 +94,32 @@ const HeroSection = () => {
     return () => window.removeEventListener("wheel", handleScroll);
   }, [slides.length]);
 
+  // Trigger slice flip animation
+  useEffect(() => {
+    setFlip(true);
+    const timer = setTimeout(() => setFlip(false), 1200);
+    return () => clearTimeout(timer);
+  }, [currentImage]);
+
   const currentSlide = slides[currentImage];
 
   return (
     <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
-      {/* Background Image Transition */}
-      <div
-        key={currentImage}
-        className="absolute inset-0 bg-cover bg-center transition-all duration-[2000ms] ease-in-out animate-zoomIn"
-        style={{ backgroundImage: `url(${currentSlide.image})` }}
-      ></div>
+      {/* 🔹 Background Slice Flip Animation (Horizontal Slices) */}
+      <div className={`hero-slices-horizontal ${flip ? "flip-active" : ""}`}>
+        {Array.from({ length: 30 }).map((_, i) => (
+          <div
+            key={i}
+            className="hero-slice-horizontal"
+            style={{
+              backgroundImage: `url(${currentSlide.image})`,
+              backgroundPosition: `center ${(i / 30) * 100}%`,
+              backgroundSize: `100% 3000%`,
+              animationDelay: `${i * 0.03}s`,
+            }}
+          ></div>
+        ))}
+      </div>
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50 z-10"></div>

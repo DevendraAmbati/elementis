@@ -67,48 +67,69 @@
   }
 }
 
-/* 🌀 Smooth fade-up animation */
-/* Smooth fade-up only for text elements */
-@keyframes fadeUpSmooth {
+.hero-section {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  background-color: #000;
+}
+
+/* --- Horizontal 3D Slice Flip Background --- */
+.hero-slices-horizontal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  perspective: 1000px;
+  z-index: 1;
+}
+
+.hero-slice-horizontal {
+  flex: 1;
+  transform-origin: bottom center; /* flip bottom → top */
+  background-size: cover;
+  background-position: center;
+  backface-visibility: hidden;
+}
+
+/* Animation for slice flip (bottom to top) */
+@keyframes flipSliceHorizontal {
   0% {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-
-  100% {
+    transform: rotateX(0deg);
     opacity: 1;
-    transform: translateY(0);
   }
-}
-
-.animate-fadeUpSmooth {
-  animation: fadeUpSmooth 1s ease-in-out forwards;
-}
-
-@keyframes zoomIn {
-  0% {
-    transform: scale(1);
+  50% {
+    transform: rotateX(-90deg); /* flip upward */
+    opacity: 0;
   }
   100% {
-    transform: scale(1.15);
-  }
-}
-
-.animate-zoomIn {
-  animation: zoomIn 8s ease-in-out forwards;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
+    transform: rotateX(0deg);
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
+.flip-active .hero-slice-horizontal {
+  animation: flipSliceHorizontal 1.2s ease-in-out forwards;
+}
+
+/* 🔍 Background Zoom Layer */
+.hero-zoom-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  transform: scale(1.05);
+  filter: brightness(0.85);
+}
+
+/* Zoom In Animation */
 @keyframes zoomIn {
   0% {
     transform: scale(1.05);
@@ -117,9 +138,23 @@
     transform: scale(1.15);
   }
 }
-
 .animate-zoomIn {
   animation: zoomIn 6s ease-in-out forwards;
+}
+
+/* Text Animations */
+@keyframes fadeUpSmooth {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeUpSmooth {
+  animation: fadeUpSmooth 1s ease forwards;
 }
 
 @keyframes letterPullUp {
@@ -135,25 +170,23 @@
     transform: translateY(0);
   }
 }
-
 .animate-letterPullUp {
   animation: letterPullUp 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-@keyframes fadeUpSmooth {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Overlay text styles */
+.hero-overlay {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
 }
 
-.animate-fadeUpSmooth {
-  animation: fadeUpSmooth 1s ease forwards;
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 }
 
-
-
+.hero-subtitle {
+  font-size: 1.3rem;
+}
