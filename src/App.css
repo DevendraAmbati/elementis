@@ -1,248 +1,61 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  text-align: center;
+/* === Vertical Slice Animation (Next Image Reveal from Bottom) === */
+.hero-slices-vertical {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 8;
+  overflow: hidden;
 }
 
-@keyframes zoom {
+.slice-vertical {
+  flex: 1;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.animate-reveal .slice-vertical {
+  animation: moveUp 1.2s ease forwards;
+}
+
+@keyframes moveUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Smooth text fade up */
+@keyframes fadeUpSmooth {
+  0% {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeUpSmooth {
+  animation: fadeUpSmooth 1s ease forwards;
+}
+
+/* Background zoom effect */
+@keyframes zoomInOut {
   0% {
     transform: scale(1);
   }
-
   100% {
     transform: scale(1.1);
   }
 }
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-zoom {
-  animation: zoom 2s ease-in-out forwards;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 1.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 1.5s ease-in-out;
-}
-
-@keyframes fadeUp {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-
-  50% {
-    opacity: 0.5;
-    transform: translateY(20px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.hero-section {
-  position: relative;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  text-align: center;
-  background-color: #000;
-}
-
-/* --- Horizontal 3D Slice Flip Background --- */
-.hero-slices-horizontal {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  perspective: 1000px;
-  z-index: 1;
-}
-
-.hero-slice-horizontal {
-  flex: 1;
-  transform-origin: bottom center; /* flip bottom → top */
-  background-size: cover;
-  background-position: center;
-  backface-visibility: hidden;
-}
-
-/* Animation for slice flip (bottom to top) */
-@keyframes flipSliceHorizontal {
-  0% {
-    transform: rotateX(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: rotateX(-90deg); /* flip upward */
-    opacity: 0;
-  }
-  100% {
-    transform: rotateX(0deg);
-    opacity: 1;
-  }
-}
-
-.flip-active .hero-slice-horizontal {
-  animation: flipSliceHorizontal 1.2s ease-in-out forwards;
-}
-
-/* 🔍 Background Zoom Layer */
-.hero-zoom-bg {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-  transform: scale(1.05);
-  filter: brightness(0.85);
-}
-
-/* Zoom In Animation */
-@keyframes zoomIn {
-  0% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1.15);
-  }
-}
-.animate-zoomIn {
-  animation: zoomIn 6s ease-in-out forwards;
-}
-
-/* Text Animations */
-@keyframes fadeUpSmooth {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.animate-fadeUpSmooth {
-  animation: fadeUpSmooth 1s ease forwards;
-}
-
-
-
-
-/* --- Smooth persistent zoom --- */
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  transition: transform 7s ease-in-out;
-  z-index: 1;
-}
-
-/* Smooth zoom-in animation */
-.hero-bg.zooming {
-  animation: zoomInEffect 6s ease-in-out forwards;
-  transform-origin: center;
-}
-
-@keyframes zoomInEffect {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(1.2);
-  }
-}
-
-/* Optional smoother transition if image stays visible */
-.zooming.active {
-  animation: zoomInEffect 4s ease-in-out forwards;
-}
-
-
-/* --- Slice Flip Animation --- */
-.hero-slices-horizontal {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  perspective: 1200px;
-  z-index: 3;
-}
-
-.hero-slice-horizontal {
-  flex: 1;
-  background-size: cover;
-  background-repeat: no-repeat;
-  transform-origin: bottom center;
-  backface-visibility: hidden;
-  opacity: 1;
-}
-
-@keyframes flipSliceHorizontal {
-  0% {
-    transform: rotateX(0deg);
-    opacity: 1;
-  }
-  40% {
-    opacity: 0.8;
-  }
-  60% {
-    transform: rotateX(-90deg);
-    opacity: 0.5;
-  }
-  100% {
-    transform: rotateX(-180deg);
-    opacity: 0;
-  }
-}
-
-.flip-active .hero-slice-horizontal {
-  animation: flipSliceHorizontal 1.3s ease-in-out forwards;
-}
-
-@keyframes fadeUpSmooth {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.animate-fadeUpSmooth {
-  animation: fadeUpSmooth 1s ease forwards;
+.zoom-in-bg {
+  animation: zoomInOut 6s ease-in-out infinite alternate;
 }

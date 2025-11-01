@@ -125,7 +125,7 @@ const HeroSection = () => {
   const nextSlide = nextImage !== null ? slides[nextImage] : null;
 
   return (
-    <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
+    <div className="relative h-screen  w-full overflow-hidden">
       {/* 🔹 Smooth Bottom-to-Top Background Transition */}
       <div
         className="absolute inset-0 bg-cover bg-center zoom-in-bg"
