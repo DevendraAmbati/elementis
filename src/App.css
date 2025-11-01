@@ -156,7 +156,16 @@
 .animate-fadeUpSmooth {
   animation: fadeUpSmooth 1s ease forwards;
 }
-/* 🔹 Background zoom animation */
+@keyframes zoomInEffect {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+/* 🔹 Background zoom layer */
 .zoom-in-bg {
   animation: zoomInEffect 8s ease-in-out forwards;
 }
@@ -169,7 +178,7 @@
   }
 }
 
-/* 🔹 Slice flip animation */
+/* 🔹 Slice container */
 .hero-slices-horizontal {
   position: absolute;
   inset: 0;
@@ -177,29 +186,30 @@
   flex-direction: column;
   overflow: hidden;
   perspective: 1200px;
-  z-index: 1;
+  z-index: 2;
 }
 
 .hero-slice-horizontal {
   flex: 1;
   background-size: cover;
   background-repeat: no-repeat;
-  transform-origin: center;
+  transform-origin: bottom center; /* ✅ flip from bottom */
   backface-visibility: hidden;
 }
 
+/* 🔹 Flip animation */
 @keyframes flipSliceHorizontal {
   0% {
     transform: rotateX(0deg);
     opacity: 1;
   }
   50% {
-    transform: rotateX(90deg);
-    opacity: 0;
+    transform: rotateX(-90deg);
+    opacity: 0.4;
   }
   100% {
-    transform: rotateX(0deg);
-    opacity: 1;
+    transform: rotateX(-180deg);
+    opacity: 0;
   }
 }
 
@@ -207,11 +217,11 @@
   animation: flipSliceHorizontal 1.2s ease-in-out forwards;
 }
 
-/* 🔹 Smooth fade up for text */
+/* 🔹 Fade-up for text */
 @keyframes fadeUpSmooth {
   0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   100% {
     opacity: 1;

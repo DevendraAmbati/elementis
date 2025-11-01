@@ -106,13 +106,12 @@ const HeroSection = () => {
   return (
     <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
       {/* ✅ Zoom-in full background only */}
-      {!flip && (
-        <div
-          className="absolute inset-0 bg-cover bg-center zoom-in-bg"
-          style={{ backgroundImage: `url(${currentSlide.image})` }}
-        ></div>
-      )}
-
+      
+  <div
+    className="absolute inset-0 bg-cover bg-center zoom-in-bg"
+    style={{ backgroundImage: `url(${slides[(currentImage + 1) % slides.length].image})` }}
+  ></div>
+      
       {/* ✅ Slices appear ONLY when flip = true */}
       {flip && (
         <div className="hero-slices-horizontal flip-active" key={currentImage}>
@@ -121,7 +120,7 @@ const HeroSection = () => {
               key={i}
               className="hero-slice-horizontal"
               style={{
-                backgroundImage: `url(${currentSlide.image})`,
+            backgroundImage: `url(${slides[currentImage].image})`,
                 backgroundPosition: `center ${(i / 30) * 100}%`,
                 backgroundSize: `100% 3000%`,
                 animationDelay: `${i * 0.03}s`,
@@ -157,7 +156,7 @@ const HeroSection = () => {
           key={`${currentImage}-title`}
           className="text-4xl sm:text-5xl text-start md:text-7xl font-light tracking-wide mb-4 animate-fadeUpSmooth"
         >
-          {currentSlide.title}
+      {slides[(currentImage + 1) % slides.length].title}
         </h2>
 
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-t border-b border-white/40 py-2 text-sm sm:text-lg font-light tracking-wide">
@@ -171,13 +170,14 @@ const HeroSection = () => {
               key={`${currentImage}-bottom`}
               style={{ animationDelay: "0.4s" }}
             >
-              {currentSlide.title} | {currentSlide.subtitle}
+                       {slides[(currentImage + 1) % slides.length].title} |{" "}
+          {slides[(currentImage + 1) % slides.length].subtitle}
             </span>
             <span className="text-white/70">
-              {currentImage + 1 < 10
-                ? `0${currentImage + 1}`
-                : currentImage + 1}{" "}
-              — {slides.length < 10 ? `0${slides.length}` : slides.length}
+               {currentImage + 1 < 10
+            ? `0${currentImage + 1}`
+            : currentImage + 1}{" "}
+          — {slides.length < 10 ? `0${slides.length}` : slides.length}
             </span>
           </div>
         </div>
@@ -190,7 +190,7 @@ const HeroSection = () => {
           className="text-white/80 max-w-md text-sm sm:text-base font-light mb-6 animate-fadeUpSmooth"
           style={{ animationDelay: "0.2s" }}
         >
-          {currentSlide.description}
+      {slides[(currentImage + 1) % slides.length].description}
         </p>
       </div>
 
