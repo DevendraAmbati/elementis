@@ -12,8 +12,7 @@ const HeroSection = () => {
         "Discover the breathtaking peaks and cultural richness of Chile in the heart of the Americas.",
     },
     {
-      image:
-        "https://wisconsinsbdc.org/wp-content/uploads/sites/2/2023/04/hileslakesmaller-1024x768.jpg",
+      image: "https://wisconsinsbdc.org/wp-content/uploads/sites/2/2023/04/hileslakesmaller-1024x768.jpg",
       title: "Asia",
       subtitle: "Japan",
       description:
@@ -29,14 +28,15 @@ const HeroSection = () => {
   ];
 
   const [currentImage, setCurrentImage] = useState(0);
-  const [nextImage, setNextImage] = useState(1);
+  const [nextImage, setNextImage] = useState(null);
+  const [animating, setAnimating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [flip, setFlip] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(true);
+  const [showText, setShowText] = useState(true);
   const canScroll = useRef(true);
 
-  // Mouse visibility
+  // Mouse visibility handler
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (window.innerWidth < 768) return;
@@ -50,11 +50,12 @@ const HeroSection = () => {
         setVisible(true);
       }
     };
+
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Auto slide
+  // Auto slide change
   useEffect(() => {
     let frame = 0;
     const duration = 4000;
@@ -66,92 +67,92 @@ const HeroSection = () => {
       frame++;
       setProgress((frame / totalFrames) * 100);
       if (frame >= totalFrames) {
-        triggerNext();
         frame = 0;
+        triggerNextSlide();
       }
     }, 1000 / frameRate);
 
     return () => clearInterval(interval);
-  }, [currentImage]);
+  }, [currentImage, slides.length]);
+
+  const triggerNextSlide = () => {
+    if (animating) return;
+    const next = (currentImage + 1) % slides.length;
+    setNextImage(next);
+    setAnimating(true);
+    setShowText(false);
+
+    setTimeout(() => {
+      setCurrentImage(next);
+      setNextImage(null);
+      setAnimating(false);
+      setShowText(true);
+    }, 1200);
+  };
 
   // Scroll navigation
   useEffect(() => {
     const handleScroll = (e) => {
-      if (!canScroll.current) return;
+      if (!canScroll.current || animating) return;
       canScroll.current = false;
 
-      if (e.deltaY > 0) triggerNext();
-      else triggerPrev();
+      if (e.deltaY > 0) {
+        triggerNextSlide();
+      } else if (e.deltaY < 0) {
+        const prev = (currentImage - 1 + slides.length) % slides.length;
+        setNextImage(prev);
+        setAnimating(true);
+        setShowText(false);
+
+        setTimeout(() => {
+          setCurrentImage(prev);
+          setNextImage(null);
+          setAnimating(false);
+          setShowText(true);
+        }, 1200);
+      }
 
       setTimeout(() => {
         canScroll.current = true;
-      }, 1500);
+      }, 1400);
     };
+
     window.addEventListener("wheel", handleScroll, { passive: true });
     return () => window.removeEventListener("wheel", handleScroll);
-  }, [currentImage]);
-
-  const triggerNext = () => {
-    setNextImage((currentImage + 1) % slides.length);
-    setFlip(true);
-    setTimeout(() => {
-      setCurrentImage((currentImage + 1) % slides.length);
-      setFlip(false);
-    }, 1200);
-  };
-
-  const triggerPrev = () => {
-    setNextImage((currentImage - 1 + slides.length) % slides.length);
-    setFlip(true);
-    setTimeout(() => {
-      setCurrentImage((currentImage - 1 + slides.length) % slides.length);
-      setFlip(false);
-    }, 1200);
-  };
+  }, [slides.length, animating]);
 
   const currentSlide = slides[currentImage];
-  const nextSlide = slides[nextImage];
+  const nextSlide = nextImage !== null ? slides[nextImage] : null;
 
   return (
     <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
-      {/* Next image with zoom-in */}
-{/* ✅ Next image zooms-in smoothly behind slices */}
-<div
-  key={currentImage}
-  className="absolute inset-0 bg-cover bg-center hero-bg zoom-in-active"
-  style={{ backgroundImage: `url(${currentSlide.image})` }}
-></div>
+      {/* 🔹 Smooth Bottom-to-Top Background Transition */}
+      <div
+        className="absolute inset-0 bg-cover bg-center zoom-in-bg"
+        style={{ backgroundImage: `url(${currentSlide.image})` }}
+      ></div>
 
-
- 
-
-      {/* Current image slices flipping */}
-      {flip ? (
-        <div className="hero-slices-horizontal flip-active" key={currentImage}>
-          {Array.from({ length: 30 }).map((_, i) => (
+      {animating && nextSlide && (
+        <div className="hero-slices-vertical animate-reveal">
+          {Array.from({ length: 20 }).map((_, i) => (
             <div
               key={i}
-              className="hero-slice-horizontal"
+              className="slice-vertical"
               style={{
-                backgroundImage: `url(${currentSlide.image})`,
-                backgroundPosition: `center ${(i / 30) * 100}%`,
-                backgroundSize: `100% 3000%`,
-                animationDelay: `${i * 0.03}s`,
+                backgroundImage: `url(${nextSlide.image})`,
+                backgroundPosition: `center ${(i / 20) * 100}%`,
+                backgroundSize: "100% 2000%",
+                animationDelay: `${i * 0.05}s`,
               }}
             ></div>
           ))}
         </div>
-      ) : (
-        // Current static background
-        <div
-          className="absolute inset-0 bg-cover bg-center zoom-in-bg"
-          style={{ backgroundImage: `url(${currentSlide.image})` }}
-        ></div>
       )}
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50 z-10"></div>
 
+      {/* Navbar */}
       <Navbar />
 
       {/* Floating Explore Button */}
@@ -170,48 +171,54 @@ const HeroSection = () => {
       )}
 
       {/* Hero Content */}
-      <div className="absolute z-20 bottom-[45%] left-0 px-6 md:px-10 text-white w-full">
-        <h2
-          key={`${currentImage}-title`}
-          className="text-4xl sm:text-5xl text-start md:text-7xl font-light tracking-wide mb-4 animate-fadeUpSmooth"
-        >
-          {currentSlide.title}
-        </h2>
-
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-t border-b border-white/40 py-2 text-sm sm:text-lg font-light tracking-wide">
-          <div className="flex items-center gap-3 mb-2 md:mb-0">
-            <span className="text-xl sm:text-2xl">≡</span>
-            <span>Explore Destinations</span>
-          </div>
-          <div className="flex items-center gap-4 sm:gap-10">
-            <span
-              className="animate-fadeUpSmooth"
-              key={`${currentImage}-bottom`}
-              style={{ animationDelay: "0.4s" }}
+      {showText && (
+        <>
+          <div className="absolute z-20 bottom-[45%] left-0 px-6 md:px-10 text-white w-full">
+            <h2
+              key={`${currentImage}-title`}
+              className="text-4xl sm:text-5xl text-start md:text-7xl font-light tracking-wide mb-4 animate-fadeUpSmooth"
             >
-              {currentSlide.title} | {currentSlide.subtitle}
-            </span>
-            <span className="text-white/70">
-              {currentImage + 1 < 10
-                ? `0${currentImage + 1}`
-                : currentImage + 1}{" "}
-              — {slides.length < 10 ? `0${slides.length}` : slides.length}
-            </span>
-          </div>
-        </div>
-      </div>
+              {currentSlide.title}
+            </h2>
 
-      {/* Description */}
-      <div className="absolute z-20 bottom-28 md:bottom-44 left-0 px-6 md:px-10 text-white w-full">
-        <p
-          key={`${currentImage}-desc`}
-          className="text-white/80 max-w-md text-sm sm:text-base font-light mb-6 animate-fadeUpSmooth"
-          style={{ animationDelay: "0.2s" }}
-        >
-          {currentSlide.description}
-        </p>
-      </div>
-            <div className="absolute z-30 bottom-5 right-0 md:right-5 flex flex-wrap md:flex-nowrap gap-4 md:gap-6 justify-center md:justify-end px-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-t border-b border-white/40 py-2 text-sm sm:text-lg font-light tracking-wide">
+              <div className="flex items-center gap-3 mb-2 md:mb-0">
+                <span className="text-xl sm:text-2xl">≡</span>
+                <span>Explore Destinations</span>
+              </div>
+              <div className="flex items-center gap-4 sm:gap-10">
+                <span
+                  className="animate-fadeUpSmooth"
+                  key={`${currentImage}-bottom`}
+                  style={{ animationDelay: "0.4s" }}
+                >
+                  {currentSlide.title} | {currentSlide.subtitle}
+                </span>
+                <span className="text-white/70">
+                  {currentImage + 1 < 10
+                    ? `0${currentImage + 1}`
+                    : currentImage + 1}{" "}
+                  — {slides.length < 10 ? `0${slides.length}` : slides.length}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="absolute z-20 bottom-28 md:bottom-44 lg:bottom-18 left-0 px-6 md:px-10 text-white w-full">
+            <p
+              key={`${currentImage}-desc`}
+              className="text-white/80 max-w-md text-sm sm:text-base font-light mb-6 animate-fadeUpSmooth"
+              style={{ animationDelay: "0.2s" }}
+            >
+              {currentSlide.description}
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* Thumbnail Carousel */}
+      <div className="absolute z-30 bottom-5 right-0 md:right-5 flex flex-wrap md:flex-nowrap gap-4 md:gap-6 justify-center md:justify-end px-4">
         {slides.map((slide, index) => (
           <div key={index} className="flex flex-col items-start">
             <p className="text-white text-start text-sm sm:text-lg mb-1 font-light">
