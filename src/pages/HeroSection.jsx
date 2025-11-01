@@ -12,7 +12,7 @@ const HeroSection = () => {
         "Discover the breathtaking peaks and cultural richness of Chile in the heart of the Americas.",
     },
     {
-      image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+      image: "https://wisconsinsbdc.org/wp-content/uploads/sites/2/2023/04/hileslakesmaller-1024x768.jpg",
       title: "Asia",
       subtitle: "Japan",
       description:
