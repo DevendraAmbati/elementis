@@ -29,6 +29,7 @@ const HeroSection = () => {
   ];
 
   const [currentImage, setCurrentImage] = useState(0);
+  const [nextImage, setNextImage] = useState(1);
   const [progress, setProgress] = useState(0);
   const [flip, setFlip] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -53,7 +54,7 @@ const HeroSection = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Auto slide change
+  // Auto slide
   useEffect(() => {
     let frame = 0;
     const duration = 4000;
@@ -65,13 +66,13 @@ const HeroSection = () => {
       frame++;
       setProgress((frame / totalFrames) * 100);
       if (frame >= totalFrames) {
+        triggerNext();
         frame = 0;
-        setCurrentImage((prev) => (prev + 1) % slides.length);
       }
     }, 1000 / frameRate);
 
     return () => clearInterval(interval);
-  }, [currentImage, slides.length]);
+  }, [currentImage]);
 
   // Scroll navigation
   useEffect(() => {
@@ -79,48 +80,61 @@ const HeroSection = () => {
       if (!canScroll.current) return;
       canScroll.current = false;
 
-      if (e.deltaY > 0) {
-        setCurrentImage((prev) => (prev + 1) % slides.length);
-      } else if (e.deltaY < 0) {
-        setCurrentImage((prev) => (prev - 1 + slides.length) % slides.length);
-      }
+      if (e.deltaY > 0) triggerNext();
+      else triggerPrev();
 
       setTimeout(() => {
         canScroll.current = true;
-      }, 1200);
+      }, 1500);
     };
-
     window.addEventListener("wheel", handleScroll, { passive: true });
     return () => window.removeEventListener("wheel", handleScroll);
-  }, [slides.length]);
-
-  // Trigger slice flip animation
-  useEffect(() => {
-    setFlip(true);
-    const timer = setTimeout(() => setFlip(false), 1200);
-    return () => clearTimeout(timer);
   }, [currentImage]);
 
+  const triggerNext = () => {
+    setNextImage((currentImage + 1) % slides.length);
+    setFlip(true);
+    setTimeout(() => {
+      setCurrentImage((currentImage + 1) % slides.length);
+      setFlip(false);
+    }, 1200);
+  };
+
+  const triggerPrev = () => {
+    setNextImage((currentImage - 1 + slides.length) % slides.length);
+    setFlip(true);
+    setTimeout(() => {
+      setCurrentImage((currentImage - 1 + slides.length) % slides.length);
+      setFlip(false);
+    }, 1200);
+  };
+
   const currentSlide = slides[currentImage];
+  const nextSlide = slides[nextImage];
 
   return (
     <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
-      {/* ✅ Zoom-in full background only */}
-      
-  <div
-    className="absolute inset-0 bg-cover bg-center zoom-in-bg"
-    style={{ backgroundImage: `url(${slides[(currentImage + 1) % slides.length].image})` }}
-  ></div>
-      
-      {/* ✅ Slices appear ONLY when flip = true */}
-      {flip && (
+      {/* Next image with zoom-in */}
+{/* ✅ Next image zooms-in smoothly behind slices */}
+<div
+  className={`absolute inset-0 bg-cover bg-center  hero-bg zooming ${
+    flip ? "active" : ""
+  }`}
+  style={{
+    backgroundImage: `url(${nextSlide.image})`,
+  }}
+></div>
+ 
+
+      {/* Current image slices flipping */}
+      {flip ? (
         <div className="hero-slices-horizontal flip-active" key={currentImage}>
           {Array.from({ length: 30 }).map((_, i) => (
             <div
               key={i}
               className="hero-slice-horizontal"
               style={{
-            backgroundImage: `url(${slides[currentImage].image})`,
+                backgroundImage: `url(${currentSlide.image})`,
                 backgroundPosition: `center ${(i / 30) * 100}%`,
                 backgroundSize: `100% 3000%`,
                 animationDelay: `${i * 0.03}s`,
@@ -128,6 +142,12 @@ const HeroSection = () => {
             ></div>
           ))}
         </div>
+      ) : (
+        // Current static background
+        <div
+          className="absolute inset-0 bg-cover bg-center zoom-in-bg"
+          style={{ backgroundImage: `url(${currentSlide.image})` }}
+        ></div>
       )}
 
       {/* Overlay */}
@@ -156,7 +176,7 @@ const HeroSection = () => {
           key={`${currentImage}-title`}
           className="text-4xl sm:text-5xl text-start md:text-7xl font-light tracking-wide mb-4 animate-fadeUpSmooth"
         >
-      {slides[(currentImage + 1) % slides.length].title}
+          {currentSlide.title}
         </h2>
 
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-t border-b border-white/40 py-2 text-sm sm:text-lg font-light tracking-wide">
@@ -170,32 +190,29 @@ const HeroSection = () => {
               key={`${currentImage}-bottom`}
               style={{ animationDelay: "0.4s" }}
             >
-                       {slides[(currentImage + 1) % slides.length].title} |{" "}
-          {slides[(currentImage + 1) % slides.length].subtitle}
+              {currentSlide.title} | {currentSlide.subtitle}
             </span>
             <span className="text-white/70">
-               {currentImage + 1 < 10
-            ? `0${currentImage + 1}`
-            : currentImage + 1}{" "}
-          — {slides.length < 10 ? `0${slides.length}` : slides.length}
+              {currentImage + 1 < 10
+                ? `0${currentImage + 1}`
+                : currentImage + 1}{" "}
+              — {slides.length < 10 ? `0${slides.length}` : slides.length}
             </span>
           </div>
         </div>
       </div>
 
       {/* Description */}
-      <div className="absolute z-20 bottom-28 md:bottom-44 lg:bottom-18 left-0 px-6 md:px-10 text-white w-full">
+      <div className="absolute z-20 bottom-28 md:bottom-44 left-0 px-6 md:px-10 text-white w-full">
         <p
           key={`${currentImage}-desc`}
           className="text-white/80 max-w-md text-sm sm:text-base font-light mb-6 animate-fadeUpSmooth"
           style={{ animationDelay: "0.2s" }}
         >
-      {slides[(currentImage + 1) % slides.length].description}
+          {currentSlide.description}
         </p>
       </div>
-
-      {/* Thumbnail Carousel */}
-      <div className="absolute z-30 bottom-5 right-0 md:right-5 flex flex-wrap md:flex-nowrap gap-4 md:gap-6 justify-center md:justify-end px-4">
+            <div className="absolute z-30 bottom-5 right-0 md:right-5 flex flex-wrap md:flex-nowrap gap-4 md:gap-6 justify-center md:justify-end px-4">
         {slides.map((slide, index) => (
           <div key={index} className="flex flex-col items-start">
             <p className="text-white text-start text-sm sm:text-lg mb-1 font-light">

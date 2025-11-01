@@ -156,29 +156,42 @@
 .animate-fadeUpSmooth {
   animation: fadeUpSmooth 1s ease forwards;
 }
+
+
+
+
+/* --- Smooth persistent zoom --- */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 7s ease-in-out;
+  z-index: 1;
+}
+
+/* Smooth zoom-in animation */
+.hero-bg.zooming {
+  animation: zoomInEffect 6s ease-in-out forwards;
+  transform-origin: center;
+}
+
 @keyframes zoomInEffect {
   0% {
     transform: scale(1);
   }
   100% {
-    transform: scale(1.15);
+    transform: scale(1.2);
   }
 }
 
-/* 🔹 Background zoom layer */
-.zoom-in-bg {
-  animation: zoomInEffect 8s ease-in-out forwards;
-}
-@keyframes zoomInEffect {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(1.15);
-  }
+/* Optional smoother transition if image stays visible */
+.zooming.active {
+  animation: zoomInEffect 4s ease-in-out forwards;
 }
 
-/* 🔹 Slice container */
+
+/* --- Slice Flip Animation --- */
 .hero-slices-horizontal {
   position: absolute;
   inset: 0;
@@ -186,26 +199,29 @@
   flex-direction: column;
   overflow: hidden;
   perspective: 1200px;
-  z-index: 2;
+  z-index: 3;
 }
 
 .hero-slice-horizontal {
   flex: 1;
   background-size: cover;
   background-repeat: no-repeat;
-  transform-origin: bottom center; /* ✅ flip from bottom */
+  transform-origin: bottom center;
   backface-visibility: hidden;
+  opacity: 1;
 }
 
-/* 🔹 Flip animation */
 @keyframes flipSliceHorizontal {
   0% {
     transform: rotateX(0deg);
     opacity: 1;
   }
-  50% {
+  40% {
+    opacity: 0.8;
+  }
+  60% {
     transform: rotateX(-90deg);
-    opacity: 0.4;
+    opacity: 0.5;
   }
   100% {
     transform: rotateX(-180deg);
@@ -214,14 +230,13 @@
 }
 
 .flip-active .hero-slice-horizontal {
-  animation: flipSliceHorizontal 1.2s ease-in-out forwards;
+  animation: flipSliceHorizontal 1.3s ease-in-out forwards;
 }
 
-/* 🔹 Fade-up for text */
 @keyframes fadeUpSmooth {
   0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   100% {
     opacity: 1;
