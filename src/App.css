@@ -156,46 +156,10 @@
 .animate-fadeUpSmooth {
   animation: fadeUpSmooth 1s ease forwards;
 }
-
-@keyframes letterPullUp {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(-5px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-.animate-letterPullUp {
-  animation: letterPullUp 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-/* Overlay text styles */
-.hero-overlay {
-  position: relative;
-  z-index: 2;
-  padding: 2rem;
-}
-
-.hero-title {
-  font-size: 3rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.hero-subtitle {
-  font-size: 1.3rem;
-}
-
-
+/* 🔹 Background zoom animation */
 .zoom-in-bg {
   animation: zoomInEffect 8s ease-in-out forwards;
 }
-
 @keyframes zoomInEffect {
   0% {
     transform: scale(1);
@@ -203,4 +167,57 @@
   100% {
     transform: scale(1.15);
   }
+}
+
+/* 🔹 Slice flip animation */
+.hero-slices-horizontal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  perspective: 1200px;
+  z-index: 1;
+}
+
+.hero-slice-horizontal {
+  flex: 1;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transform-origin: center;
+  backface-visibility: hidden;
+}
+
+@keyframes flipSliceHorizontal {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: rotateX(90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+.flip-active .hero-slice-horizontal {
+  animation: flipSliceHorizontal 1.2s ease-in-out forwards;
+}
+
+/* 🔹 Smooth fade up for text */
+@keyframes fadeUpSmooth {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeUpSmooth {
+  animation: fadeUpSmooth 1s ease forwards;
 }

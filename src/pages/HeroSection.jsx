@@ -12,7 +12,8 @@ const HeroSection = () => {
         "Discover the breathtaking peaks and cultural richness of Chile in the heart of the Americas.",
     },
     {
-      image: "https://wisconsinsbdc.org/wp-content/uploads/sites/2/2023/04/hileslakesmaller-1024x768.jpg",
+      image:
+        "https://wisconsinsbdc.org/wp-content/uploads/sites/2/2023/04/hileslakesmaller-1024x768.jpg",
       title: "Asia",
       subtitle: "Japan",
       description:
@@ -34,7 +35,7 @@ const HeroSection = () => {
   const [visible, setVisible] = useState(true);
   const canScroll = useRef(true);
 
-  // Mouse visibility handler
+  // Mouse visibility
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (window.innerWidth < 768) return;
@@ -48,7 +49,6 @@ const HeroSection = () => {
         setVisible(true);
       }
     };
-
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
@@ -105,29 +105,35 @@ const HeroSection = () => {
 
   return (
     <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
-      {/* 🔹 Background Slice Flip Animation (Horizontal Slices) */}
-      <div
-        className={`hero-slices-horizontal zoom-in-bg ${flip ? "flip-active" : ""}`}
-        key={currentImage}
-      >
-        {Array.from({ length: 30 }).map((_, i) => (
-          <div
-            key={i}
-            className="hero-slice-horizontal "
-            style={{
-              backgroundImage: `url(${currentSlide.image})`,
-              backgroundPosition: `center ${(i / 30) * 100}%`,
-              backgroundSize: `100% 3000%`,
-              animationDelay: `${i * 0.03}s`,
-            }}
-          ></div>
-        ))}
-      </div>
+      {/* ✅ Zoom-in full background only */}
+      {!flip && (
+        <div
+          className="absolute inset-0 bg-cover bg-center zoom-in-bg"
+          style={{ backgroundImage: `url(${currentSlide.image})` }}
+        ></div>
+      )}
+
+      {/* ✅ Slices appear ONLY when flip = true */}
+      {flip && (
+        <div className="hero-slices-horizontal flip-active" key={currentImage}>
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div
+              key={i}
+              className="hero-slice-horizontal"
+              style={{
+                backgroundImage: `url(${currentSlide.image})`,
+                backgroundPosition: `center ${(i / 30) * 100}%`,
+                backgroundSize: `100% 3000%`,
+                animationDelay: `${i * 0.03}s`,
+              }}
+            ></div>
+          ))}
+        </div>
+      )}
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50 z-10"></div>
 
-      {/* Navbar */}
       <Navbar />
 
       {/* Floating Explore Button */}
