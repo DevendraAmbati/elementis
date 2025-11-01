@@ -117,13 +117,12 @@ const HeroSection = () => {
       {/* Next image with zoom-in */}
 {/* ✅ Next image zooms-in smoothly behind slices */}
 <div
-  className={`absolute inset-0 bg-cover bg-center  hero-bg zooming ${
-    flip ? "active" : ""
-  }`}
-  style={{
-    backgroundImage: `url(${nextSlide.image})`,
-  }}
+  key={currentImage}
+  className="absolute inset-0 bg-cover bg-center hero-bg zoom-in-active"
+  style={{ backgroundImage: `url(${currentSlide.image})` }}
 ></div>
+
+
  
 
       {/* Current image slices flipping */}
