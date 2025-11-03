@@ -9,7 +9,7 @@ const HeroSection = () => {
       title: "Americas",
       subtitle: "Chile",
       description:
-        "Discover the breathtaking peaks and cultural richness of Chile in the heart of the Americas.",
+        "Discover the breathtaking peaks | and cultural richness of Chile | in the heart of the Americas.",
     },
     {
       image:
@@ -17,14 +17,14 @@ const HeroSection = () => {
       title: "Asia",
       subtitle: "Japan",
       description:
-        "Experience the blend of ancient traditions and futuristic innovation across the islands of Japan.",
+        "Experience the blend of ancient traditions | and futuristic innovation | across the islands of Japan.",
     },
     {
       image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
       title: "Europe",
       subtitle: "Iceland",
       description:
-        "Explore the land of fire and ice — where glaciers, volcanoes, and auroras paint the skies.",
+        "Explore the land of fire and ice | where glaciers and volcanoes | paint the skies with auroras.",
     },
   ];
 
@@ -34,9 +34,10 @@ const HeroSection = () => {
   const [flip, setFlip] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(true);
+  const [displayedTitle, setDisplayedTitle] = useState("");
   const canScroll = useRef(true);
 
-  // Mouse visibility
+  // 🔹 Mouse visibility for Explore button
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (window.innerWidth < 768) return;
@@ -54,10 +55,32 @@ const HeroSection = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Auto slide
+  //  Title typing effect (fully fixed, no missing letters)
+  useEffect(() => {
+    const title = slides[currentImage]?.title || "";
+    setDisplayedTitle(); // reset first
+
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < title.length) {
+        setDisplayedTitle((prev) => prev + title.charAt(index));
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 100); // speed per letter
+
+    // start immediately with first letter
+    setDisplayedTitle(title.charAt(0));
+    index = 0;
+
+    return () => clearInterval(interval);
+  }, [currentImage]);
+
+  // 🔹 Auto progress for each slide
   useEffect(() => {
     let frame = 0;
-    const duration = 4000;
+    const duration = 5000;
     const frameRate = 30;
     const totalFrames = (duration / 1000) * frameRate;
 
@@ -70,19 +93,16 @@ const HeroSection = () => {
         frame = 0;
       }
     }, 1000 / frameRate);
-
     return () => clearInterval(interval);
   }, [currentImage]);
 
-  // Scroll navigation
+  // 🔹 Scroll navigation
   useEffect(() => {
     const handleScroll = (e) => {
       if (!canScroll.current) return;
       canScroll.current = false;
-
       if (e.deltaY > 0) triggerNext();
       else triggerPrev();
-
       setTimeout(() => {
         canScroll.current = true;
       }, 1500);
@@ -91,20 +111,24 @@ const HeroSection = () => {
     return () => window.removeEventListener("wheel", handleScroll);
   }, [currentImage]);
 
+  // 🔹 Transition handlers
   const triggerNext = () => {
-    setNextImage((currentImage + 1) % slides.length);
-    setFlip(true);
-    setTimeout(() => {
-      setCurrentImage((currentImage + 1) % slides.length);
-      setFlip(false);
-    }, 1200);
+    const next = (currentImage + 1) % slides.length;
+    playFlipTransition(next);
   };
 
   const triggerPrev = () => {
-    setNextImage((currentImage - 1 + slides.length) % slides.length);
+    const prev = (currentImage - 1 + slides.length) % slides.length;
+    playFlipTransition(prev);
+  };
+
+  // 🔹 Play flip animation for target index
+  const playFlipTransition = (targetIndex) => {
+    if (targetIndex === currentImage) return;
+    setNextImage(targetIndex);
     setFlip(true);
     setTimeout(() => {
-      setCurrentImage((currentImage - 1 + slides.length) % slides.length);
+      setCurrentImage(targetIndex);
       setFlip(false);
     }, 1200);
   };
@@ -112,49 +136,48 @@ const HeroSection = () => {
   const currentSlide = slides[currentImage];
   const nextSlide = slides[nextImage];
 
+
   return (
     <div className="relative h-screen 2xl:h-[800px] w-full overflow-hidden">
-      {/* Next image with zoom-in */}
-{/* ✅ Next image zooms-in smoothly behind slices */}
-<div
-  key={currentImage}
-  className="absolute inset-0 bg-cover bg-center hero-bg zoom-in-active"
-  style={{ backgroundImage: `url(${currentSlide.image})` }}
-></div>
+      {/*  Background with zoom effect */}
+      <div
+        key={currentImage}
+        className="absolute inset-0 bg-cover bg-center hero-bg zoom-in-active transition-transform duration-[8000ms] ease-out scale-100"
+        style={{
+          backgroundImage: `url(${currentSlide.image})`,
+          transform: "scale(1.1)",
+        }}
+      ></div>
 
-
- 
-
-      {/* Current image slices flipping */}
+      {/*  Flip transition */}
       {flip ? (
-        <div className="hero-slices-horizontal flip-active" key={currentImage}>
-          {Array.from({ length: 30 }).map((_, i) => (
-            <div
-              key={i}
-              className="hero-slice-horizontal"
-              style={{
-                backgroundImage: `url(${currentSlide.image})`,
-                backgroundPosition: `center ${(i / 30) * 100}%`,
-                backgroundSize: `100% 3000%`,
-                animationDelay: `${i * 0.03}s`,
-              }}
-            ></div>
-          ))}
+        <div className="relative h-full w-full">
+          <div
+            className="absolute inset-0 bg-cover bg-center next-bg"
+            style={{ backgroundImage: `url(${nextSlide.image})` }}
+          ></div>
+          <div className="hero-slices-horizontal flip-active" key={currentImage}>
+            {Array.from({ length: 70 }).map((_, i) => (
+              <div
+                key={i}
+                className="hero-slice-horizontal"
+                style={{
+                  "--i": i,
+                  backgroundImage: `url(${currentSlide.image})`,
+                  backgroundPosition: `center ${(i / 70) * 100}%`,
+                  backgroundSize: `100% 3000%`,
+                }}
+              ></div>
+            ))}
+          </div>
         </div>
-      ) : (
-        // Current static background
-        <div
-          className="absolute inset-0 bg-cover bg-center zoom-in-bg"
-          style={{ backgroundImage: `url(${currentSlide.image})` }}
-        ></div>
-      )}
+      ) : null}
 
-      {/* Overlay */}
+      {/*  Overlay */}
       <div className="absolute inset-0 bg-black/50 z-10"></div>
-
       <Navbar />
 
-      {/* Floating Explore Button */}
+      {/*  Floating Explore Button */}
       {visible && (
         <div
           className="hidden md:block absolute z-30 pointer-events-none transition-transform duration-100 ease-out"
@@ -168,50 +191,75 @@ const HeroSection = () => {
           </button>
         </div>
       )}
-
-      {/* Hero Content */}
+      {/*  Hero Text Section */}
       <div className="absolute z-20 bottom-[45%] left-0 px-6 md:px-10 text-white w-full">
         <h2
           key={`${currentImage}-title`}
-          className="text-4xl sm:text-5xl text-start md:text-7xl font-light tracking-wide mb-4 animate-fadeUpSmooth"
+          className="text-4xl sm:text-5xl md:text-7xl font-light tracking-wide mb-4 flex gap-1"
         >
-          {currentSlide.title}
+          {displayedTitle.split("").map((char, i) => (
+            <span
+              key={i}
+              className="opacity-0 animate-fadeInLetter"
+              style={{ animationDelay: `${i * 0.05}s` }}
+            >
+              {char}
+            </span>
+          ))}
         </h2>
 
+        {/*  Bottom Info */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-t border-b border-white/40 py-2 text-sm sm:text-lg font-light tracking-wide">
           <div className="flex items-center gap-3 mb-2 md:mb-0">
             <span className="text-xl sm:text-2xl">≡</span>
             <span>Explore Destinations</span>
           </div>
-          <div className="flex items-center gap-4 sm:gap-10">
+
+          <div className="flex items-center gap-4 md:gap-20">
             <span
-              className="animate-fadeUpSmooth"
               key={`${currentImage}-bottom`}
-              style={{ animationDelay: "0.4s" }}
+              className="text-lg font-light flex flex-wrap gap-2"
             >
-              {currentSlide.title} | {currentSlide.subtitle}
+              {`${currentSlide.title} | ${currentSlide.subtitle}`
+                .split(" ")
+                .map((word, i) => (
+                  <span
+                    key={i}
+                    className="opacity-0 animate-fadeInWordSmooth"
+                    style={{ animationDelay: `${i * 0.2}s` }}
+                  >
+                    {word}
+                  </span>
+                ))}
             </span>
             <span className="text-white/70">
-              {currentImage + 1 < 10
-                ? `0${currentImage + 1}`
-                : currentImage + 1}{" "}
+              {currentImage + 1 < 10 ? `0${currentImage + 1}` : currentImage + 1}
               — {slides.length < 10 ? `0${slides.length}` : slides.length}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Description */}
-      <div className="absolute z-20 bottom-28 md:bottom-44 left-0 px-6 md:px-10 text-white w-full">
-        <p
+      {/*  Description Section */}
+      <div className="absolute z-20 bottom-28 md:bottom-12 left-0 px-6 md:px-10 text-white w-full">
+        <div
           key={`${currentImage}-desc`}
-          className="text-white/80 max-w-md text-sm sm:text-base font-light mb-6 animate-fadeUpSmooth"
-          style={{ animationDelay: "0.2s" }}
+          className="text-white/80 max-w-md text-sm sm:text-base font-light mb-6 flex flex-col gap-1"
         >
-          {currentSlide.description}
-        </p>
+          {currentSlide.description.split("|").map((part, i) => (
+            <p
+              key={i}
+              className="opacity-0 text-start animate-fadeUpSmooth"
+              style={{ animationDelay: `${i * 0.6}s` }}
+            >
+              {part.trim()}
+            </p>
+          ))}
+        </div>
       </div>
-            <div className="absolute z-30 bottom-5 right-0 md:right-5 flex flex-wrap md:flex-nowrap gap-4 md:gap-6 justify-center md:justify-end px-4">
+
+      {/*  Thumbnails */}
+      <div className="absolute z-30 bottom-5 right-0 md:right-5 flex flex-wrap md:flex-nowrap gap-4 md:gap-6 justify-center md:justify-end px-4">
         {slides.map((slide, index) => (
           <div key={index} className="flex flex-col items-start">
             <p className="text-white text-start text-sm sm:text-lg mb-1 font-light">
@@ -221,16 +269,14 @@ const HeroSection = () => {
               <img
                 src={slide.image}
                 alt={`Thumbnail ${index + 1}`}
-                onClick={() => setCurrentImage(index)}
-                className={`w-21 sm:w-32 md:w-32 h-18 sm:h-24 md:h-20 object-cover rounded-md cursor-pointer transition-all duration-[1200ms] ease-in-out ${
-                  currentImage === index ? "opacity-100 scale-105" : "opacity-50"
-                }`}
+                onClick={() => playFlipTransition(index)}
+                className={`w-21 sm:w-32 md:w-32 h-18 sm:h-24 md:h-20 object-cover rounded-md cursor-pointer transition-all duration-[1200ms] ease-in-out ${currentImage === index ? "opacity-100 scale-105" : "opacity-50"
+                  }`}
               />
             </div>
             <div
-              className={`mt-2 h-[2px] w-21 sm:w-32 md:w-32 relative overflow-hidden transition-all duration-500 ${
-                currentImage === index ? "bg-white/40" : "bg-transparent"
-              }`}
+              className={`mt-2 h-[1px] w-21 sm:w-32 md:w-32 relative overflow-hidden transition-all duration-500 ${currentImage === index ? "bg-white/40" : "bg-transparent"
+                }`}
             >
               {currentImage === index && (
                 <div
