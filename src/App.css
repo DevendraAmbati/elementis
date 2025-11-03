@@ -1,7 +1,10 @@
 #root {
-  max-width: 1280px;
+  max-width: 1450px;
   margin: 0 auto;
   text-align: center;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 100;
+  font-style: normal;
 }
 
 @keyframes zoom {
@@ -79,44 +82,117 @@
   background-color: #000;
 }
 
-/* --- Horizontal 3D Slice Flip Background --- */
+/* --- Horizontal Flip from Bottom → Top --- */
+/* --- Smooth Bottom → Top Flip + Travel --- */
 .hero-slices-horizontal {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  perspective: 1000px;
-  z-index: 1;
+  perspective: 1200px;
+  z-index: 3;
 }
 
 .hero-slice-horizontal {
   flex: 1;
-  transform-origin: bottom center; /* flip bottom → top */
+  transform-origin: bottom center;
   background-size: cover;
-  background-position: center;
+  background-position: top;
   backface-visibility: hidden;
+  opacity: 1;
 }
 
-/* Animation for slice flip (bottom to top) */
-@keyframes flipSliceHorizontal {
+/* 🔹 Outgoing slices: start flat, flip upward while moving up */
+@keyframes flipSliceOut {
   0% {
-    transform: rotateX(0deg);
+    transform: translateY(0) rotateX(0deg);
     opacity: 1;
   }
-  50% {
-    transform: rotateX(-90deg); /* flip upward */
-    opacity: 0;
+  40% {
+    transform: translateY(-20px) rotateX(-60deg);
+    opacity: 0.9;
+  }
+  70% {
+    transform: translateY(-40px) rotateX(-120deg);
+    opacity: 0.5;
   }
   100% {
-    transform: rotateX(0deg);
+    transform: translateY(-60px) rotateX(-180deg);
+    opacity: 0;
+  }
+}
+
+/* 🔹 Incoming slices: start below and flip upward into place */
+@keyframes flipSliceIn {
+  0% {
+    transform: translateY(60px) rotateX(180deg);
+    opacity: 0;
+  }
+  30% {
+    transform: translateY(30px) rotateX(120deg);
+    opacity: 0.6;
+  }
+  60% {
+    transform: translateY(10px) rotateX(60deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0) rotateX(0deg);
     opacity: 1;
   }
 }
 
-.flip-active .hero-slice-horizontal {
-  animation: flipSliceHorizontal 1.2s ease-in-out forwards;
+@keyframes flipBottomToTop {
+  0% {
+    transform: translateY(0) rotateX(0deg);
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(-15px) rotateX(-60deg);
+    opacity: 0.9;
+  }
+  60% {
+    transform: translateY(-30px) rotateX(-120deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-45px) rotateX(-180deg);
+    opacity: 0;
+  }
 }
+
+/* Apply animation to all slices */
+.flip-active .hero-slice-horizontal {
+  animation: flipBottomToTop 1.4s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: calc(var(--i) * 0.015s);
+}
+
+/* ✅ Layer order for visibility */
+.next-bg {
+  z-index: 1;
+  filter: brightness(0.9);
+  opacity: 0;
+  animation: fadeNextBg 1.2s ease-in-out forwards;
+}
+
+.hero-slices-horizontal {
+  z-index: 2;
+}
+
+.hero-bg {
+  z-index: 0;
+}
+
+
+
+.flip-active .hero-slice-horizontal {
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+.flip-active .hero-slice-horizontal:nth-child(even) {
+  animation: flipSliceIn 1.4s ease-in-out forwards;
+}
+
 
 /* 🔍 Background Zoom Layer */
 .hero-zoom-bg {
@@ -191,48 +267,6 @@
 }
 
 
-/* --- Slice Flip Animation --- */
-.hero-slices-horizontal {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  perspective: 1200px;
-  z-index: 3;
-}
-
-.hero-slice-horizontal {
-  flex: 1;
-  background-size: cover;
-  background-repeat: no-repeat;
-  transform-origin: bottom center;
-  backface-visibility: hidden;
-  opacity: 1;
-}
-
-@keyframes flipSliceHorizontal {
-  0% {
-    transform: rotateX(0deg);
-    opacity: 1;
-  }
-  40% {
-    opacity: 0.8;
-  }
-  60% {
-    transform: rotateX(-90deg);
-    opacity: 0.5;
-  }
-  100% {
-    transform: rotateX(-180deg);
-    opacity: 0;
-  }
-}
-
-.flip-active .hero-slice-horizontal {
-  animation: flipSliceHorizontal 1.3s ease-in-out forwards;
-}
-
 @keyframes fadeUpSmooth {
   0% {
     opacity: 0;
@@ -246,3 +280,84 @@
 .animate-fadeUpSmooth {
   animation: fadeUpSmooth 1s ease forwards;
 }
+@keyframes fadeInLetter {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeInLetter {
+  animation: fadeInLetter 0.5s ease forwards;
+}
+
+@keyframes fadeInWordSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeInWordSmooth {
+  animation: fadeInWordSmooth 0.8s ease forwards;
+}
+
+@keyframes fadeUpSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeUpSmooth {
+  animation: fadeUpSmooth 1s ease forwards;
+}
+
+@keyframes zoomInBackground {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+.zoom-in-active {
+  animation: zoomInBackground 8s ease-out forwards;
+}
+
+.next-bg {
+  z-index: 1;
+  filter: brightness(0.9);
+  opacity: 0;
+  animation: fadeNextBg 1.2s ease-in-out forwards;
+}
+
+@keyframes fadeNextBg {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.hero-text-layer {
+  position: relative;
+  z-index: 50 !important;
+  pointer-events: none;
+}
+
+
+
